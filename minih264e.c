@@ -1,4 +1,6 @@
 #define H264E_SVC_API 0
 #define H264E_MAX_THREADS 0
+#define H264E_ENABLE_DENOISE 0
+#define MAX_LONG_TERM_FRAMES 1
 #define MINIH264_IMPLEMENTATION
 #include "minih264e.h"

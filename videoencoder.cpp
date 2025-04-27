@@ -7,6 +7,8 @@
 #include "utility.hpp"
 #define H264E_SVC_API 0
 #define H264E_MAX_THREADS 0
+#define H264E_ENABLE_DENOISE 0
+#define MAX_LONG_TERM_FRAMES 1
 #include "minih264e.h"
 
 void VideoEncoder::init(VkPhysicalDevice physicalDevice, VkDevice device, VmaAllocator allocator,
@@ -416,7 +418,7 @@ void VideoEncoder::getOutputVideoPacket(const char*& data, size_t& size) {
         throw std::runtime_error("Error: H264E_encode returned " + std::to_string(err));
     }
     size = codedSize;
-    printf("Encoded frame %d, status %d, offset %d, size %zd\n", m_frameCount, err, 0, size);
+    // printf("Encoded frame %d, status %d, offset %d, size %zd\n", m_frameCount, err, 0, size);
  }
 
 void VideoEncoder::deinit() {

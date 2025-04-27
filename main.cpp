@@ -1,3 +1,4 @@
+#include <chrono>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
@@ -42,8 +43,14 @@ class VulkanApplication {
    public:
     void run() {
         initVulkan();
+
+        auto start = std::chrono::high_resolution_clock::now();
         mainLoop();
         cleanup();
+
+        auto end = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double, std::milli> elapsed = end - start;
+        std::cout << "Time taken: " << elapsed.count() << " ms" << std::endl;
     }
 
    private:
