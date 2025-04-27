@@ -1,19 +1,3 @@
-/*
- * Vulkan Video Encode Extension - Simple Example
- *
- * Copyright (c) 2024 Bernhard C. Schrenk <clemy@clemy.org>
- *   University of Vienna
- *   https://www.univie.ac.at/
- * developed during the courses "Cloud Gaming" & "Practical Course 1"
- *   supervised by Univ.-Prof. Dipl.-Ing. Dr. Helmut Hlavacs <helmut.hlavacs@univie.ac.at>
- *     University of Vienna
- *     Research Group "EDEN - Education, Didactics and Entertainment Computing"
- *     https://eden.cs.univie.ac.at/
- *
- * This file is licensed under the MIT license.
- * See the LICENSE file in the project root for full license information.
- */
-
 #pragma once
 #define VK_NO_PROTOTYPES
 #ifdef __linux__
@@ -25,8 +9,6 @@
 #endif
 
 #include <vector>
-
-#include "h264parameterset.hpp"
 
 class VideoEncoder {
    public:
@@ -41,18 +23,10 @@ class VideoEncoder {
     ~VideoEncoder() { deinit(); }
 
    private:
-    void createEncodeCommandPool();
-    void createVideoSession();
-    void allocateVideoSessionMemory();
-    void createVideoSessionParameters(uint32_t fps);
-    void readBitstreamHeader();
-    void allocateOutputBitStream();
-    void allocateReferenceImages(uint32_t count);
     void allocateIntermediateImage();
-    void createOutputQueryPool();
+    void allocateTransferBuffer();
     void createYCbCrConversionPipeline(const std::vector<VkImageView>& inputImageViews);
-    void initRateControl(VkCommandBuffer cmdBuf, uint32_t fps);
-    void transitionImagesInitial(VkCommandBuffer cmdBuf);
+    void initializeCodec();
 
     void convertRGBtoYCbCr(uint32_t currentImageIx);
     void encodeVideoFrame();
@@ -66,32 +40,9 @@ class VideoEncoder {
     VkQueue m_computeQueue;
     uint32_t m_computeQueueFamily;
     VkCommandPool m_computeCommandPool;
-    VkCommandPool m_encodeCommandPool;
     std::vector<VkImage> m_inputImages;
     uint32_t m_width;
     uint32_t m_height;
-
-    VkVideoSessionKHR m_videoSession;
-    std::vector<VmaAllocation> m_allocations;
-    StdVideoH264SequenceParameterSetVui m_vui;
-    StdVideoH264SequenceParameterSet m_sps;
-    StdVideoH264PictureParameterSet m_pps;
-    VkVideoSessionParametersKHR m_videoSessionParameters;
-    VkVideoEncodeH264ProfileInfoKHR m_encodeH264ProfileInfoExt;
-    VkVideoProfileInfoKHR m_videoProfile;
-    VkVideoProfileListInfoKHR m_videoProfileList;
-
-    VkVideoEncodeRateControlModeFlagBitsKHR m_chosenRateControlMode;
-    VkFormat m_chosenSrcImageFormat;
-    VkFormat m_chosenDpbImageFormat;
-
-    VkVideoEncodeH264RateControlLayerInfoKHR m_encodeH264RateControlLayerInfo = {
-        VK_STRUCTURE_TYPE_VIDEO_ENCODE_H264_RATE_CONTROL_LAYER_INFO_KHR};
-    VkVideoEncodeRateControlLayerInfoKHR m_encodeRateControlLayerInfo = {
-        VK_STRUCTURE_TYPE_VIDEO_ENCODE_RATE_CONTROL_LAYER_INFO_KHR};
-    VkVideoEncodeH264RateControlInfoKHR m_encodeH264RateControlInfo = {
-        VK_STRUCTURE_TYPE_VIDEO_ENCODE_H264_RATE_CONTROL_INFO_KHR};
-    VkVideoEncodeRateControlInfoKHR m_encodeRateControlInfo = {VK_STRUCTURE_TYPE_VIDEO_ENCODE_RATE_CONTROL_INFO_KHR};
 
     VkDescriptorSetLayout m_computeDescriptorSetLayout;
     VkPipelineLayout m_computePipelineLayout;
@@ -99,30 +50,20 @@ class VideoEncoder {
     VkDescriptorPool m_descriptorPool;
     std::vector<VkDescriptorSet> m_computeDescriptorSets;
 
-    VkSemaphore m_interQueueSemaphore;
-    VkSemaphore m_interQueueSemaphore2;
-    VkSemaphore m_interQueueSemaphore3;
-
-    VkQueryPool m_queryPool;
-    VkBuffer m_bitStreamBuffer;
-    VmaAllocation m_bitStreamBufferAllocation;
-    std::vector<char> m_bitStreamHeader;
-    bool m_bitStreamHeaderPending;
-
-    char* m_bitStreamData;
-
     VkImage m_yCbCrImage;
     VmaAllocation m_yCbCrImageAllocation;
     VkImageView m_yCbCrImageView;
     std::vector<VkImageView> m_yCbCrImagePlaneViews;
 
-    std::vector<VkImage> m_dpbImages;
-    std::vector<VmaAllocation> m_dpbImageAllocations;
-    std::vector<VkImageView> m_dpbImageViews;
+    VkBuffer m_transferBuffer;
+    VmaAllocation m_transferBufferAllocation;
+    unsigned char* m_transferData;
+
+    void* m_codecDataPersist;
+    void* m_codecDataScratch;
 
     uint32_t m_frameCount;
 
     VkFence m_encodeFinishedFence;
     VkCommandBuffer m_computeCommandBuffer;
-    VkCommandBuffer m_encodeCommandBuffer;
 };

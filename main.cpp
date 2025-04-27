@@ -25,8 +25,8 @@
 #include "videoencoder.hpp"
 
 const uint32_t NUM_FRAMES_TO_WRITE = 300;
-const uint32_t WIDTH = 800;
-const uint32_t HEIGHT = 600;
+const uint32_t WIDTH = 1024;
+const uint32_t HEIGHT = 768;
 const size_t IMAGE_INFLIGHT_COUNT = 2;
 
 const std::vector<const char *> deviceExtensions = {

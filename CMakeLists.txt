@@ -25,6 +25,6 @@ endforeach()
 
 add_custom_target(build_shaders DEPENDS ${SHADER_OUT_NAMES})
 
-add_executable(headless main.cpp videoencoder.cpp)
+add_executable(headless main.cpp videoencoder.cpp minih264e.c)
 target_include_directories(headless PRIVATE $<TARGET_PROPERTY:Vulkan::volk,INTERFACE_INCLUDE_DIRECTORIES>)
 add_dependencies(headless build_shaders)
